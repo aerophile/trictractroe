@@ -2,7 +2,7 @@
  *    
  *     Title: Tric Trac Troe (a Tic Tac Toe game)
  *     Author: shubham Gupta
- *     Description: An attempt in making tic tac toe  game based machine learning System 
+ *     Description: A tic tac toe  game based machine learning System 
  *     contact: shubham0075+mlp@gmail.com
  * 
  ***************************************************************************************************************/
@@ -56,13 +56,14 @@ class position
 		  
 		  
 		 void raw_disp(){
+			 //mainly for diagnostic use, it displays the ternary number corresponding to the position of the tic tactoe game's position.
 			 cout<<endl<<"  "<<this->box[1]<<this->box[2]<<this->box[3]<<this->box[4]<<this->box[5]<<this->box[6]<<this->box[7]<<this->box[8]<<this->box[9];} 
    
   
          bool isValid(){
 			 
 			 
-			 //checks invalid positions by comparing number of x and o's
+			 //checks invalid positions by comparing number of x and o's since the difference can't be higher than one in a valid game
 			 int x=0,o=0,i=1;
 			    while (i<10){
 					if (this->box[i]==1)
@@ -72,7 +73,7 @@ class position
 					i++;} 
 					
 					
-			//checks fo multiple wins
+			//checks fo multiple wins   //only one win is possible in a valid game
 			 int win=0,count=1;
 			  //rows win check
 			  while(count<8){
@@ -96,7 +97,7 @@ class position
 			     
 			     
 			   			     		
-				//valid or invalid result return	
+				//valid or invalid result return	//sums up all of the previous check conditions in the function.
 				if((o-x)>1||(x-o)>1  || win>1 || (o+x)<4 )
 				 return false;
 				else
@@ -105,6 +106,7 @@ class position
 					}  
   
          bool isEqual(position c){
+			 //to compare two positions and return them is equal.
 			 int i=1;
 			 while(i<10)
 			 {if(this->box[i]!=c.box[i])
@@ -209,6 +211,10 @@ class game: public position {
 
 
 position trinary(int counter1){ 
+	//converts the decimal number into a ternary number of base 3 (I incorrectly named it trinary based on binary) 
+	//this function also asssigns the number to a position after ternary conversion and that position is ultimately returned.
+	//using this ternary system i am able to represent 0 as a blank, 1 as X and 2 as O. the render() function is responsible for converting 
+	//the numbers to these symbols while displaying the numbers. 
 	position b;
 	int i=1;
 	while(i<10 && counter1!=0){
@@ -220,12 +226,7 @@ position trinary(int counter1){
 	
 	}
 
-
-
-int main(){
-	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
-	 
-	 
+void generate_positions(){
 	int counter=19683,countofvalid=0;
 	while(counter>0){
 		a[counter]=trinary(counter);
@@ -237,11 +238,12 @@ int main(){
 	    a[counter].disp();
 	    countofvalid++;}
 	    counter--;}
-	 //cout<<"\n Number of valid positions "<<countofvalid; 
-	 
-	 
-	 
-	
+	 //cout<<"\n Number of valid positions "<<countofvalid;
+	}
+
+int main(){
+	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
+	 generate_positions();
 	 
 	 game g;
 	 g.play();
