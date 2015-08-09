@@ -12,9 +12,6 @@
 using namespace std;
 
 
-
-
-
 class position
 {
 	public:
@@ -37,7 +34,7 @@ class position
 		   }
 		  box[i]=99;}
 		
-		void disp(){
+		void disp(){  //main display function used.It also has the tic tac toe grid display and it is used to display by default
 			cout<<endl<<"  "<<render(this->box[1])<<" | "<<render(this->box[2])<<" | "<<render(this->box[3])<<endl;
 			char a[]="------------";
 			cout<<" "<<a;
@@ -105,8 +102,7 @@ class position
 					
 					}  
   
-         bool isEqual(position c){
-			 //to compare two positions and return them is equal.
+         bool isEqual(position c){//to compare two positions and return true if they are equal.
 			 int i=1;
 			 while(i<10)
 			 {if(this->box[i]!=c.box[i])
@@ -161,22 +157,31 @@ class game: public position {
 	public:
 	
 	
-	void play()
+	void play(int play_mode)
 	{ int i=1,move;
 		while(i<10){//play main loop
 						system("clear");
 						int current_player=(i%2)==1?1:2;
 						this->disp();
+						int currentid,nextid;
+						currentid=this->getId(); 
 						cout<<endl<<render(current_player)<<" to move\n";
 						cin>>move;
 								if(move<10 && move>0 && this->box[move]==0)
 								  {this->box[move]= (i%2)==1?1:2;
+									  
+									  nextid=this->getId();
+									  a[currentid].next_moves[0]=nextid;
+									  a[currentid].skill_counter++;
+									  
+									  
 									  this->learn();
 									  
 									  if(this->isWin()){
 										 { system("clear");
 											 this->disp();
 											 cout<<"Winner is "<<render(current_player);
+											 
 											 break;}
 										 }
 									  i++;
@@ -192,7 +197,15 @@ class game: public position {
 		    cout<<"\n This Game is Drawn\n";}}
 		    
 		    
-		    
+		    int getId(){
+				int counter=0,climit=19684;
+					while(counter<climit)
+					{
+						if(this->isEqual(a[counter]))
+						  {return a[counter].id;}
+						counter++;
+						}
+				}
 		    
 		    void learn(){
 				int counter=0,climit=19684;
@@ -246,5 +259,5 @@ int main(){
 	 generate_positions();
 	 
 	 game g;
-	 g.play();
+	 g.play(play_mode);
  }
