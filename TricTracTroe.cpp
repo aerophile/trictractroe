@@ -8,6 +8,7 @@
  ***************************************************************************************************************/
 
 #include <iostream>
+#include <cstdlib>
 #include <stdlib.h>
 using namespace std;
 
@@ -156,9 +157,18 @@ position a[20000]; //global declaration of position array that contains all the 
 class game: public position {
 	public:
 	
-	
+	int game_sequence[11];//use to store all the position ids of the game's moves which will be further analysed in case of win or draw
+	                      // index 0 is not used,index 1 will always be 0, from index 2 to 10 are the actual Position ids that matter  
+	  game(){
+		  int count=0;
+		  while(count<12)
+			  {game_sequence[count]=-1;
+			  count++;
+			  }
+		    }
 	void play(int play_mode)
-	{ int i=1,move;
+	{ if(play_mode==1)
+		{int i=1,move;
 		while(i<10){//play main loop
 						system("clear");
 						int current_player=(i%2)==1?1:2;
@@ -167,7 +177,58 @@ class game: public position {
 						currentid=this->getId(); 
 						cout<<endl<<render(current_player)<<" to move\n";
 						cin>>move;
-								if(move<10 && move>0 && this->box[move]==0)
+								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
+								  {this->box[move]= (i%2)==1?1:2;
+									  this->game_sequence[move]=currentid;
+									  nextid=this->getId();
+									  a[currentid].next_moves[0]=nextid;
+									  a[currentid].skill_counter++;
+									  
+									  
+									  
+									  if(this->isWin()){
+										 { this->game_sequence[move+1]=nextid;
+											 system("clear");
+											 this->disp();
+											 cout<<"Winner is "<<render(current_player)<<endl;
+											 
+											 break;}
+										 }
+									  i++;
+							
+									  }
+								 else
+									{cout<<endl<<"move not valid\n";}
+									
+							}
+		if (i==10 && this->isWin()!=true){
+			system("clear");
+			this->disp();
+		    cout<<"\n This Game is Drawn\n";
+		    this->game_sequence[move+1]=this->getId();
+		    
+		 
+		    
+		    }}
+		    
+		    
+		    
+		    //playmode 3 refine
+		    
+		    
+		    
+		    
+		    if(play_mode==3)
+		{int i=1,move;
+		while(i<10){//play main loop
+						system("clear");
+						int current_player=(i%2)==1?1:2;
+						this->disp();
+						int currentid,nextid;
+						currentid=this->getId(); 
+						cout<<endl<<render(current_player)<<" to move\n";
+						move=rand() % 9 + 1;//random function used cstdlib
+								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
 								  {this->box[move]= (i%2)==1?1:2;
 									  
 									  nextid=this->getId();
@@ -175,7 +236,7 @@ class game: public position {
 									  a[currentid].skill_counter++;
 									  
 									  
-									  this->learn();
+									  
 									  
 									  if(this->isWin()){
 										 { system("clear");
@@ -196,6 +257,8 @@ class game: public position {
 			this->disp();
 		    cout<<"\n This Game is Drawn\n";}}
 		    
+		    }
+		    
 		    
 		    int getId(){
 				int counter=0,climit=19684;
@@ -207,7 +270,7 @@ class game: public position {
 						}
 				}
 		    
-		    void learn(){
+		 /*   void learn(){
 				int counter=0,climit=19684;
 					while(counter<climit)
 					{
@@ -216,7 +279,7 @@ class game: public position {
 							  break;}
 						counter++;
 						}
-				}
+				}*/
 		
 	
 	};
@@ -258,6 +321,14 @@ int main(){
 	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
 	 generate_positions();
 	 
-	 game g;
-	 g.play(play_mode);
+	 int play_mode=-1;
+	 char carryon='y';
+	 
+	 while(carryon=='y' || carryon=='Y'){
+	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n";
+	 cin>>play_mode;
+	 game* g = new game;
+	 g->play(play_mode);
+	 cout<<"\ncarry on ?  ";
+	 cin>>carryon;}
  }
