@@ -23,17 +23,19 @@ class position
 	
 	int box[10];       //actual storage of elements of tic tac toe
 	//int moves;         //number of moves in the current position. This has been started from a min 4 to max 9
-	int skill_counter; //keeps count of entreis into next_moves...useful for getting skill rating of AI
+	int skill_counter; //keeps count of entries into next_moves...useful for getting skill rating of AI
 
 		position(){
 			next_moves[0]=next_moves[1]=next_moves[2]=-1;
 			skill_counter=0;
+			
 	    int i=9;
-		while(i >0)
+		while(i >0)   //initialising the position to all boxes having zeroes
 		   {box[i]=0;
 		    i--;
 		   }
-		  box[i]=99;}
+		  box[i]=99;//last box of position initialised to 99 
+		  }
 		
 		void disp(){  //main display function used.It also has the tic tac toe grid display and it is used to display by default
 			cout<<endl<<"  "<<render(this->box[1])<<" | "<<render(this->box[2])<<" | "<<render(this->box[3])<<endl;
@@ -54,7 +56,8 @@ class position
 		  
 		  
 		 void raw_disp(){
-			 //mainly for diagnostic use, it displays the ternary number corresponding to the position of the tic tactoe game's position.
+			 //mainly for diagnostic use, it displays the ternary number directly corresponding to the position of the tic tactoe game's position.
+			 
 			 cout<<endl<<"  "<<this->box[1]<<this->box[2]<<this->box[3]<<this->box[4]<<this->box[5]<<this->box[6]<<this->box[7]<<this->box[8]<<this->box[9];} 
    
   
@@ -149,7 +152,27 @@ class position
   
    };
 
-
+class random_fast_move
+{public:
+	int move_array[9],move_array_limit;
+	
+	       random_fast_move(){
+			 move_array_limit=8;
+			for(int j=0;j<9;j++)
+			move_array[j]=j+1;
+			}
+			
+			int chose_moveby_random()
+			{
+							int amove_index,move1;
+							amove_index=rand() % move_array_limit;
+							move1= move_array[amove_index];
+							
+							for(int j1=amove_index;j1<move_array_limit;j1++)
+							  move_array[j1]=move_array[j1+1];
+							move_array_limit-=1;
+							return move1;
+				}};
 
 position a[20000]; //global declaration of position array that contains all the possible valid positions of tic tac toe
 
@@ -220,6 +243,9 @@ class game: public position {
 		    
 		    if(play_mode==3)
 		{int i=1,move;
+			random_fast_move obj;
+			
+				
 		while(i<10){//play main loop
 						system("clear");
 						int current_player=(i%2)==1?1:2;
@@ -227,21 +253,28 @@ class game: public position {
 						int currentid,nextid;
 						currentid=this->getId(); 
 						cout<<endl<<render(current_player)<<" to move\n";
+						
+						//move=obj.chose_moveby_random();//use for new class
 						move=rand() % 9 + 1;//random function used cstdlib
+						/* debug code for new chose random class based assignment
+						 * for(int k=0;k<9;k++)
+						cout<<obj.move_array[k]<<" ";
+						int b1;
+						cin>>b1;*/
 								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
-								  {this->box[move]= (i%2)==1?1:2;
-									  
+								  {this->box[move]= (i%2)==1?1:2; // determing whether to put 1 or 2 ie O or X
+									  this->game_sequence[move]=currentid;
 									  nextid=this->getId();
 									  a[currentid].next_moves[0]=nextid;
 									  a[currentid].skill_counter++;
 									  
 									  
 									  
-									  
 									  if(this->isWin()){
-										 { system("clear");
+										 { this->game_sequence[move+1]=nextid;
+											 system("clear");
 											 this->disp();
-											 cout<<"Winner is "<<render(current_player);
+											 cout<<"Winner is "<<render(current_player)<<endl;
 											 
 											 break;}
 										 }
@@ -255,7 +288,9 @@ class game: public position {
 		if (i==10 && this->isWin()!=true){
 			system("clear");
 			this->disp();
-		    cout<<"\n This Game is Drawn\n";}}
+		    cout<<"\n This Game is Drawn\n";
+		    this->game_sequence[move+1]=this->getId();
+		   }}
 		    
 		    }
 		    
@@ -268,7 +303,7 @@ class game: public position {
 						  {return a[counter].id;}
 						counter++;
 						}
-				}
+				   }
 		    
 		 /*   void learn(){
 				int counter=0,climit=19684;
@@ -321,14 +356,19 @@ int main(){
 	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
 	 generate_positions();
 	 
-	 int play_mode=-1;
+	 int play_mode=-1,instances=1;
 	 char carryon='y';
 	 
 	 while(carryon=='y' || carryon=='Y'){
 	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n";
 	 cin>>play_mode;
-	 game* g = new game;
+	 if(play_mode==3)
+	 {cout<<"\nEnter number of games to play :";
+      cin>>instances;}
+	 while(instances>0)
+	 {game* g = new game;
 	 g->play(play_mode);
+	 instances--;}
 	 cout<<"\ncarry on ?  ";
 	 cin>>carryon;}
  }
