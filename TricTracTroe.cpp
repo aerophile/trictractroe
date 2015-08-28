@@ -154,23 +154,23 @@ class position
 
 class random_fast_move
 {public:
-	int move_array[9],move_array_limit;
+	int move_array[10],move_array_limit;
 	
 	       random_fast_move(){
-			 move_array_limit=8;
-			for(int j=0;j<9;j++)
+			 move_array_limit=9; //this will return all numbers from 1 to 9 in a much better and quicker way as opposed to directly using random function
+			for(int j=0;j<10;j++)
 			move_array[j]=j+1;
 			}
 			
 			int chose_moveby_random()
 			{
 							int amove_index,move1;
-							amove_index=rand() % move_array_limit;
+							amove_index=rand() % (move_array_limit);
 							move1= move_array[amove_index];
 							
 							for(int j1=amove_index;j1<move_array_limit;j1++)
-							  move_array[j1]=move_array[j1+1];
-							move_array_limit-=1;
+							  {move_array[j1]=move_array[j1+1];}
+							move_array_limit--;
 							return move1;
 				}};
 
@@ -254,8 +254,8 @@ class game: public position {
 						currentid=this->getId(); 
 						cout<<endl<<render(current_player)<<" to move\n";
 						
-						//move=obj.chose_moveby_random();//use for new class
-						move=rand() % 9 + 1;//random function used cstdlib
+						move=obj.chose_moveby_random();//use for new class
+						//move=rand() % 9 + 1;//random function used cstdlib
 						/* debug code for new chose random class based assignment
 						 * for(int k=0;k<9;k++)
 						cout<<obj.move_array[k]<<" ";
