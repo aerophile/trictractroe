@@ -13,6 +13,7 @@
 #include <stdlib.h>
 using namespace std;
 
+int game_sequences[11][25000],gscounter=0,gamecount=0;
 
 class position
 {
@@ -175,9 +176,28 @@ class random_fast_move
 							return move1;
 				}};
 
-position a[20000]; //global declaration of position array that contains all the possible valid positions of tic tac toe
 
-int game_sequences[11][5000],gscounter=0;
+ class learnt_stack{
+	 public:
+	 //static int numb;
+	 int game_learn[11];
+	 
+	 learnt_stack(){
+						 int count=0;
+						  while(count<12)
+							  {game_learn[count]=-1;
+							  count++;}
+							  
+							  
+							//numb++;  
+		 }
+	 
+	 };
+
+position a[20000]; //global declaration of position array that contains all the possible valid positions of tic tac toe
+learnt_stack b[20000];
+
+
 class game: public position {
 	public:
 	
@@ -248,6 +268,66 @@ class game: public position {
 		    
 		    }}
 		    
+		    //player vs computer function...using the inteligence
+		    
+		else if(play_mode==2)
+		{int i=1,move;
+		while(i<10){//play main loop
+						system("clear");
+						int current_player=(i%2)==1?1:2;
+						this->disp();
+						int currentid,nextid;
+						currentid=this->getId(); 
+						cout<<endl<<render(current_player)<<" to move\n";
+						
+						if(current_player==1){
+						cin>>move;
+		    								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
+												  {this->box[move]= (i%2)==1?1:2;
+													  this->game_sequence[i]=currentid;
+													  nextid=this->getId();}
+													  
+											else
+									            {cout<<endl<<"move not valid\n";}}
+									            
+									            
+						else if(current_player==2){
+							int move_done=0;
+							while(move_done==0){
+							move=rand() % 9 + 1;
+							
+							 if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
+			                      {this->box[move]= (i%2)==1?1:2;
+								   this->game_sequence[i]=currentid;
+								   nextid=this->getId();
+								   move_done=1;
+								  }
+													  }}
+									        
+									  
+									  
+									  if(this->isWin())
+										 { this->game_sequence[i+1]=nextid;
+											 system("clear");
+											 this->disp();
+											 cout<<"Winner is "<<render(current_player)<<endl;
+											 
+											 break;}
+										 
+									  i++;
+							
+									  }
+
+									
+							
+		if (i==10 && this->isWin()!=true){
+			system("clear");
+			this->disp();
+		    cout<<"\n This Game is Drawn\n";
+		    this->game_sequence[i+1]=this->getId();
+		                                 }
+		                                 
+		        }
 		    
 		    
 		    //playmode 3 refine
@@ -258,7 +338,7 @@ class game: public position {
 		    else if(play_mode==3)
 		{int i=1,move;
 			random_fast_move obj;
-		
+		     gamecount++;
 			
 				
 		while(i<10){//play main loop
@@ -294,10 +374,10 @@ class game: public position {
 									  
 									  
 									  if(this->isWin()){
-										 { //this->game_sequence[move+1]=nextid;
+										 { 
 											 this->game_sequence[i+1]=nextid;
 											 
-											 //remove above line
+											 
 											 system("clear");
 											 this->disp();
 											 cout<<"Winner is "<<render(current_player)<<endl;
@@ -307,8 +387,8 @@ class game: public position {
 									  i++;
 							
 									  }
-								 else
-									{cout<<endl<<"move not valid\n";}
+								 //else
+									//cout<<endl<<"move not valid\n";
 									
 							} 
 							
@@ -316,15 +396,16 @@ class game: public position {
 			system("clear");
 			this->disp();
 		    cout<<"\n This Game is Drawn\n"; game_sequence[0]=3; //storing a draw stuation
-		    //this->game_sequence[move+1]=this->getId();
+		    
 		    this->game_sequence[i]=this->getId();
-		    //remove above
+		    
 		   } 
 		   
 		   
 		   for(int l=0;l<11;l++){
-		   game_sequences[l][gscounter]=game_sequence[l];
-		   }
+		  game_sequences[l][gscounter]=game_sequence[l];
+		    // b[gscounter].game_learn[l]=game_sequence[l];
+		  }
 		   gscounter++;
 		   /*not working error code 134
 		    * fstream fileobj;
@@ -399,12 +480,14 @@ void generate_positions(){
 	    counter--;}
 	 //cout<<"\n Number of valid positions "<<countofvalid;
 	}
+	
+	
 
 int main(){
 	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
 	 generate_positions();
 	 
-	 int play_mode=-1,instances=1;
+	 int play_mode=-1,instances=1,instances1,instances2;
 	 char carryon='y';
 	 
 	 while(carryon=='y' || carryon=='Y'){
@@ -412,14 +495,18 @@ int main(){
 	 cin>>play_mode;
 	 if(play_mode==3)
 		 {cout<<"\nEnter number of games to play :";
-			 int instances1;
+			 
 		  cin>>instances;//1;
-		//  instances1/=500;
-		//for(instances=500;(instances1)>0;(instances1)--)
+		  
+		 //instances2=instances1;
+		 //instances2/=1000;
+		//for(instances=1000;(instances2)>0;(instances2)--)
 		 while(instances>0)
 		 {game* g = new game;
 		 g->play(play_mode);
-		 instances--;}
+		 instances--;
+		 //delete g;
+		 }
 		
 		 }
       else{
@@ -428,14 +515,21 @@ int main(){
 		  }	 
 	 
 	 int counter=0;
-	 while(counter<500){
+	 while(counter<instances1){
+		
+		 cout<<counter<<" | ";
 	 for(int l=0;l<11;l++){
 		   cout<<game_sequences[l][counter]<<" ";
+		   //cout<<b[counter].game_learn[l]<<" ";
 		   }
 		   cout<<endl;
 		   counter++;
 		   }
-	 
+	 cout<<gamecount;
 	 cout<<"\ncarry on ?  ";
 	 cin>>carryon;}
  }
+ 
+ 
+
+	 
