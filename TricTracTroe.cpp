@@ -8,6 +8,7 @@
  ***************************************************************************************************************/
 
 #include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <stdlib.h>
 using namespace std;
@@ -176,21 +177,34 @@ class random_fast_move
 
 position a[20000]; //global declaration of position array that contains all the possible valid positions of tic tac toe
 
-
+int game_sequences[11][5000],gscounter=0;
 class game: public position {
 	public:
 	
 	int game_sequence[11];//use to store all the position ids of the game's moves which will be further analysed in case of win or draw
-	                      // index 0 is not used,index 1 will always be 0, from index 2 to 10 are the actual Position ids that matter  
+	                      // index 0 is used for storing game info,index 1 will always be 0, from index 2 to 10 are the actual Position ids that matter  
 	  game(){
 		  int count=0;
 		  while(count<12)
 			  {game_sequence[count]=-1;
 			  count++;
+			  
 			  }
 		    }
 	void play(int play_mode)
-	{ if(play_mode==1)
+	{ if(play_mode==4)
+		{  int pid;
+			 do{
+					cout<<"id of position to displayed ( -1 for exit ):";
+					
+					cin>>pid;
+					a[pid].disp();
+    			}while(pid!=-1);
+		}
+		
+		
+		
+		else if(play_mode==1)
 		{int i=1,move;
 		while(i<10){//play main loop
 						system("clear");
@@ -202,7 +216,7 @@ class game: public position {
 						cin>>move;
 								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
 								  {this->box[move]= (i%2)==1?1:2;
-									  this->game_sequence[move]=currentid;
+									  this->game_sequence[i]=currentid;
 									  nextid=this->getId();
 									  a[currentid].next_moves[0]=nextid;
 									  a[currentid].skill_counter++;
@@ -210,7 +224,7 @@ class game: public position {
 									  
 									  
 									  if(this->isWin()){
-										 { this->game_sequence[move+1]=nextid;
+										 { this->game_sequence[i+1]=nextid;
 											 system("clear");
 											 this->disp();
 											 cout<<"Winner is "<<render(current_player)<<endl;
@@ -228,7 +242,7 @@ class game: public position {
 			system("clear");
 			this->disp();
 		    cout<<"\n This Game is Drawn\n";
-		    this->game_sequence[move+1]=this->getId();
+		    this->game_sequence[i+1]=this->getId();
 		    
 		 
 		    
@@ -238,12 +252,13 @@ class game: public position {
 		    
 		    //playmode 3 refine
 		    
+	
 		    
 		    
-		    
-		    if(play_mode==3)
+		    else if(play_mode==3)
 		{int i=1,move;
 			random_fast_move obj;
+		
 			
 				
 		while(i<10){//play main loop
@@ -261,21 +276,32 @@ class game: public position {
 						cout<<obj.move_array[k]<<" ";
 						int b1;
 						cin>>b1;*/
+						
+						
+						
+						
 								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
-								  {this->box[move]= (i%2)==1?1:2; // determing whether to put 1 or 2 ie O or X
-									  this->game_sequence[move]=currentid;
+								  {this->box[move]= (i%2)==1?1:2; // determing whether to put 1 or 2 i.e. O or X
+									  
+									  //this->game_sequence[move]=currentid; i made a mistake here...game sequence array will be stored sequentially and not by move position 
+									     this->game_sequence[i]=currentid;
 									  nextid=this->getId();
 									  a[currentid].next_moves[0]=nextid;
 									  a[currentid].skill_counter++;
 									  
+									  //debug code below
+									  cout<<currentid<<" v   "<<nextid<<endl;
 									  
 									  
 									  if(this->isWin()){
-										 { this->game_sequence[move+1]=nextid;
+										 { //this->game_sequence[move+1]=nextid;
+											 this->game_sequence[i+1]=nextid;
+											 
+											 //remove above line
 											 system("clear");
 											 this->disp();
 											 cout<<"Winner is "<<render(current_player)<<endl;
-											 
+											 game_sequence[0]=current_player;//storing the winner at the beginning of the array game_sequence 
 											 break;}
 										 }
 									  i++;
@@ -284,14 +310,36 @@ class game: public position {
 								 else
 									{cout<<endl<<"move not valid\n";}
 									
-							}
+							} 
+							
 		if (i==10 && this->isWin()!=true){
 			system("clear");
 			this->disp();
-		    cout<<"\n This Game is Drawn\n";
-		    this->game_sequence[move+1]=this->getId();
-		   }}
+		    cout<<"\n This Game is Drawn\n"; game_sequence[0]=3; //storing a draw stuation
+		    //this->game_sequence[move+1]=this->getId();
+		    this->game_sequence[i]=this->getId();
+		    //remove above
+		   } 
+		   
+		   
+		   for(int l=0;l<11;l++){
+		   game_sequences[l][gscounter]=game_sequence[l];
+		   }
+		   gscounter++;
+		   /*not working error code 134
+		    * fstream fileobj;
+		   fileobj.open("learnt.txt",ios::out);
+		   fileobj.put("hoooo haaa");
+		   fileobj.close();*/
 		    
+		   
+		   
+		   
+		   }
+		    
+		   
+		   
+		   
 		    }
 		    
 		    
@@ -360,15 +408,34 @@ int main(){
 	 char carryon='y';
 	 
 	 while(carryon=='y' || carryon=='Y'){
-	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n";
+	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n(4) show a position \n";
 	 cin>>play_mode;
 	 if(play_mode==3)
-	 {cout<<"\nEnter number of games to play :";
-      cin>>instances;}
-	 while(instances>0)
-	 {game* g = new game;
-	 g->play(play_mode);
-	 instances--;}
+		 {cout<<"\nEnter number of games to play :";
+			 int instances1;
+		  cin>>instances;//1;
+		//  instances1/=500;
+		//for(instances=500;(instances1)>0;(instances1)--)
+		 while(instances>0)
+		 {game* g = new game;
+		 g->play(play_mode);
+		 instances--;}
+		
+		 }
+      else{
+		  game* g = new game;
+		  g->play(play_mode);
+		  }	 
+	 
+	 int counter=0;
+	 while(counter<500){
+	 for(int l=0;l<11;l++){
+		   cout<<game_sequences[l][counter]<<" ";
+		   }
+		   cout<<endl;
+		   counter++;
+		   }
+	 
 	 cout<<"\ncarry on ?  ";
 	 cin>>carryon;}
  }
