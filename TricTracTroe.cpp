@@ -14,6 +14,7 @@
 using namespace std;
 
 int game_sequences[11][25000],gscounter=0,gamecount=0;
+int instances1,instances2;
 
 class position
 {
@@ -176,7 +177,7 @@ class random_fast_move
 							return move1;
 				}};
 
-
+/*
  class learnt_stack{
 	 public:
 	 //static int numb;
@@ -192,11 +193,18 @@ class random_fast_move
 							//numb++;  
 		 }
 	 
-	 };
+	 }; */
+	 
+	 
+	 
+	
 
 position a[20000]; //global declaration of position array that contains all the possible valid positions of tic tac toe
-learnt_stack b[20000];
+//learnt_stack b[20000];
 
+position trinary(int);
+int compare_and_move(int,int);
+int research_next_move(int);
 
 class game: public position {
 	public:
@@ -272,16 +280,20 @@ class game: public position {
 		    
 		else if(play_mode==2)
 		{int i=1,move;
+		 int move_source=0;//to tell where the move came from
 		while(i<10){//play main loop
 						system("clear");
+						
 						int current_player=(i%2)==1?1:2;
 						this->disp();
+						cout<<"\n move by "<<move_source<<endl;
 						int currentid,nextid;
 						currentid=this->getId(); 
 						cout<<endl<<render(current_player)<<" to move\n";
 						
 						if(current_player==1){
 						cin>>move;
+						move_source=4;
 		    								if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
 												  {this->box[move]= (i%2)==1?1:2;
 													  this->game_sequence[i]=currentid;
@@ -294,7 +306,24 @@ class game: public position {
 						else if(current_player==2){
 							int move_done=0;
 							while(move_done==0){
-							move=rand() % 9 + 1;
+								
+								
+								
+							//move choosing here
+							if (research_next_move(currentid)==-5)
+							    {move=rand() % 9 + 1;
+								 move_source=1;
+								}
+		
+							else
+								{move=compare_and_move(currentid,research_next_move(currentid));
+									move_source=2;
+									if (move==-1)
+									{move=rand() % 9 + 1;
+									 move_source=3;}
+								}
+						    
+						    //int a5;cout<<"\n  move received is  "<<move<" dgsd";cin>>a5;
 							
 							 if(move<10 && move>0 && this->box[move]==0) //conditions for a valid move
 			                      {this->box[move]= (i%2)==1?1:2;
@@ -418,6 +447,25 @@ class game: public position {
 		   
 		   }
 		    
+		    
+		    else if(play_mode==5){
+							int counter=0;
+							
+							if (instances1==0)
+							cout<<"\nno games played yet\n";
+							else{
+						 while(counter<instances1){
+							
+							 cout<<counter<<" | ";
+						 for(int l=0;l<11;l++){
+							   cout<<game_sequences[l][counter]<<" ";
+							   //cout<<b[counter].game_learn[l]<<" ";
+							   }
+							   cout<<endl;
+							   counter++;
+							   }
+						 cout<<"no brains just played "<<gamecount<<"games against itself";
+									}}
 		   
 		   
 		   
@@ -447,9 +495,37 @@ class game: public position {
 		
 	
 	};
+	
 
 
-
+int research_next_move(int currentid){
+	int i=0;
+	while(i<instances1){
+		
+		 for(int l=0;l<11;l++){
+		   if(game_sequences[l][i]==currentid && (game_sequences[0][i]==2 ))//|| game_sequences[0][i]==3)) to allow fro draw cases also enable this
+		    return game_sequences[l+1][i];
+		   }
+		
+		i++;
+		}
+		
+		return -5;
+	}
+	
+ int compare_and_move(int pid1,int pid2){
+	position a2 = trinary(pid1);
+	position b2 = trinary(pid2);
+	
+	int i=1;
+	for(;i<10;i++)
+	{if (a2.box[i] != b2.box[i])
+		return i;
+		}
+	if (i==10)
+		return -6;
+ }
+ 
 position trinary(int counter1){ 
 	//converts the decimal number into a ternary number of base 3 (I incorrectly named it trinary based on binary) 
 	//this function also asssigns the number to a position after ternary conversion and that position is ultimately returned.
@@ -466,6 +542,8 @@ position trinary(int counter1){
 	
 	}
 
+
+
 void generate_positions(){
 	int counter=19683,countofvalid=0;
 	while(counter>0){
@@ -481,17 +559,17 @@ void generate_positions(){
 	 //cout<<"\n Number of valid positions "<<countofvalid;
 	}
 	
-	
+
 
 int main(){
 	//some testing code  used to generate the different valid tic tac toe positions posible in a game 
 	 generate_positions();
 	 
-	 int play_mode=-1,instances=1,instances1,instances2;
+	 int play_mode=-1,instances=1;
 	 char carryon='y';
 	 
 	 while(carryon=='y' || carryon=='Y'){
-	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n(4) show a position \n";
+	  cout<<"Enter game modes\n(1)human vs Human\n(2)Humaan vs Nobrains\n(3) Two crazy Nobrains \n(4) show a position \n(5) show games played experience\n";
 	 cin>>play_mode;
 	 if(play_mode==3)
 		 {cout<<"\nEnter number of games to play :";
@@ -501,6 +579,7 @@ int main(){
 		 //instances2=instances1;
 		 //instances2/=1000;
 		//for(instances=1000;(instances2)>0;(instances2)--)
+		instances1=instances;
 		 while(instances>0)
 		 {game* g = new game;
 		 g->play(play_mode);
@@ -514,18 +593,7 @@ int main(){
 		  g->play(play_mode);
 		  }	 
 	 
-	 int counter=0;
-	 while(counter<instances1){
-		
-		 cout<<counter<<" | ";
-	 for(int l=0;l<11;l++){
-		   cout<<game_sequences[l][counter]<<" ";
-		   //cout<<b[counter].game_learn[l]<<" ";
-		   }
-		   cout<<endl;
-		   counter++;
-		   }
-	 cout<<gamecount;
+	
 	 cout<<"\ncarry on ?  ";
 	 cin>>carryon;}
  }
