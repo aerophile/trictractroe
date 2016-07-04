@@ -18,4 +18,3 @@ for the tic tac toe grid. Chose number accordingly.
 #Notes
 I  further also plan to take the human out of the system and make the game train itself by playing games against itself making it unsupervised learning system.
 Just like Arthur Samuel's Checkers.
-Also Incase this thing becomes too smart please don't use it to make AI weapons :P  . 
